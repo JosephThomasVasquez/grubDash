@@ -60,7 +60,7 @@ const bodyHasDishes = (req, res, next) => {
 const bodyHasDishQuantity = (req, res, next) => {
   const { data: { dishes } = {} } = req.body;
 
-  const filterDishes = dishes.forEach((dish, index) => {
+  dishes.forEach((dish, index) => {
     const { quantity } = dish;
 
     if (
@@ -77,6 +77,19 @@ const bodyHasDishQuantity = (req, res, next) => {
   });
 
   next();
+};
+
+const orderExists = (req, res, next) => {
+  const { orderId } = req.params;
+
+  const foundOrder = orders.find((order) => orderId === order.id);
+
+  if (foundOrder) {
+    res.locals.order = foundOrder;
+    return next();
+  }
+
+  return next({ status: 404, message: `Order does not exist: ${orderId}` });
 };
 
 // ROUTE RESOURCES (CRUD HANDLERS) =============================================================================
@@ -106,6 +119,7 @@ const create = (req, res) => {
 
 module.exports = {
   list,
+  read: [orderExists, read],
   create: [
     bodyHasDeliverTo,
     bodyHasMobileNumber,
