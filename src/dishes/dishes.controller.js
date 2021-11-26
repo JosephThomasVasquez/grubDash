@@ -126,8 +126,6 @@ const update = (req, res, next) => {
   let dish = res.locals.dish;
   const { data: { id, name, description, price, image_url } = {} } = req.body;
 
-  console.log("dishId", typeof dish, dish);
-
   const updateDish = {
     id: dishId,
     name,
@@ -137,7 +135,6 @@ const update = (req, res, next) => {
   };
 
   dish = updateDish;
-  console.log("locas dish", dish);
 
   return res.status(200).json({ data: dish });
 };
