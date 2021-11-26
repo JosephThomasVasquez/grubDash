@@ -10,6 +10,68 @@ const nextId = require("../utils/nextId");
 
 // MIDDLEWARE =================================================================================================
 
+const checkProperties = (property) => {};
+
+const bodyHasProperties = (req, res, next) => {
+  //   console.log("req.body:", req.body);
+  const { data: { name, description, price, image_url } = {} } = req.body;
+};
+
+const bodyHasName = (req, res, next) => {
+  const { data: { name } = {} } = req.body;
+
+  if (name === undefined || name === "") {
+    next({
+      status: 400,
+      message: "Dish must include a name",
+    });
+  }
+  next();
+};
+
+const bodyHasDescription = (req, res, next) => {
+  const { data: { description } = {} } = req.body;
+
+  if (description === undefined || description === "") {
+    next({
+      status: 400,
+      message: "Dish must include a description",
+    });
+  }
+  next();
+};
+
+const bodyHasPrice = (req, res, next) => {
+  const { data: { price } = {} } = req.body;
+
+  if (price === undefined || price === "") {
+    next({
+      status: 400,
+      message: "Dish must include a price",
+    });
+  }
+
+  if (price <= 0 || isNaN(price)) {
+    next({
+      status: 400,
+      message: "Dish must have a price that is an integer greater than 0",
+    });
+  }
+  next();
+};
+
+const bodyHasImageUrl = (req, res, next) => {
+  const { data: { image_url } = {} } = req.body;
+
+  if (image_url === undefined || image_url === "") {
+    next({
+      status: 400,
+      message: "Dish must include a image_url",
+    });
+  }
+  next();
+};
+
 const dishExists = (req, res, next) => {
   const { dishId } = req.params;
 
@@ -42,7 +104,16 @@ const create = (req, res) => {
   };
 
   dishes.push(newDish);
-  res.status(201).json({ data: newDishh });
+  res.status(201).json({ data: newDish });
 };
 
-module.exports = { list };
+module.exports = {
+  list,
+  create: [
+    bodyHasName,
+    bodyHasDescription,
+    bodyHasPrice,
+    bodyHasImageUrl,
+    create,
+  ],
+};
