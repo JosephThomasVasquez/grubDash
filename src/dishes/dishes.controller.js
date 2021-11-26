@@ -29,4 +29,20 @@ const list = (req, res) => {
   res.json({ data: dishes });
 };
 
+const create = (req, res) => {
+  console.log("req.body:", req.body);
+  const { data: { name, description, price, image_url } = {} } = req.body;
+
+  const newDish = {
+    id: nextId(),
+    name,
+    description,
+    price,
+    image_url,
+  };
+
+  dishes.push(newDish);
+  res.status(201).json({ data: newDishh });
+};
+
 module.exports = { list };
