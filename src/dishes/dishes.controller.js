@@ -10,13 +10,6 @@ const nextId = require("../utils/nextId");
 
 // MIDDLEWARE =================================================================================================
 
-const checkProperties = (property) => {};
-
-const bodyHasProperties = (req, res, next) => {
-  //   console.log("req.body:", req.body);
-  const { data: { name, description, price, image_url } = {} } = req.body;
-};
-
 const bodyHasName = (req, res, next) => {
   const { data: { name } = {} } = req.body;
 
@@ -75,11 +68,11 @@ const bodyHasImageUrl = (req, res, next) => {
 const dishExists = (req, res, next) => {
   const { dishId } = req.params;
 
-  const foundDish = dishes.find((dish) => dishId === Number(dish.id));
+  const foundDish = dishes.find((dish) => dishId === dish.id);
 
   if (foundDish) {
     res.locals.dish = foundDish;
-    next();
+    return next();
   }
 
   return next({ status: 404, message: `Dish id not found: ${dishId}` });
@@ -91,8 +84,11 @@ const list = (req, res) => {
   res.json({ data: dishes });
 };
 
+const read = (req, res) => {
+  res.json({ data: res.locals.dish });
+};
+
 const create = (req, res) => {
-  console.log("req.body:", req.body);
   const { data: { name, description, price, image_url } = {} } = req.body;
 
   const newDish = {
@@ -107,8 +103,13 @@ const create = (req, res) => {
   res.status(201).json({ data: newDish });
 };
 
+const update = (req, res, next) => {
+  const dish = res.locals.dish;
+};
+
 module.exports = {
   list,
+  read: [dishExists, read],
   create: [
     bodyHasName,
     bodyHasDescription,
