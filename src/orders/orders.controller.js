@@ -38,7 +38,6 @@ const bodyHasDishes = (req, res, next) => {
   const { data: { dishes } = {} } = req.body;
 
   const dishesIsArray = Array.isArray(dishes);
-  console.log("isArray?", dishesIsArray);
 
   if (dishes === undefined || dishes === "") {
     return next({
@@ -97,7 +96,7 @@ const isIdValid = (req, res, next) => {
   next();
 };
 
-const orderStatus = (req, res, next) => {
+const isValidStatus = (req, res, next) => {
   const { orderId } = req.params;
   const { data: { status } = {} } = req.body;
 
@@ -115,6 +114,19 @@ const orderStatus = (req, res, next) => {
 
   //   if (status === "delivered")
   return next();
+};
+
+const orderIsPending = (req, res, next) => {
+  const { status } = res.locals.order;
+
+  if (status === "pending") {
+    return next();
+  }
+
+  return next({
+    status: 400,
+    message: `An order cannot be deleted unless it is pending`,
+  });
 };
 
 const orderExists = (req, res, next) => {
@@ -174,7 +186,14 @@ const update = (req, res, next) => {
   return res.status(200).json({ data: order });
 };
 
-const destroy = (req, res, next) => {};
+const destroy = (req, res) => {
+  const { orderId } = req.params;
+  const index = orders.findIndex((order) => order.id === orderId);
+
+  orders.splice(index, 1);
+
+  return res.sendStatus(204);
+};
 
 module.exports = {
   list,
@@ -193,7 +212,8 @@ module.exports = {
     bodyHasDishes,
     bodyHasDishQuantity,
     isIdValid,
-    orderStatus,
+    isValidStatus,
     update,
   ],
+  delete: [orderExists, isIdValid, orderIsPending, destroy],
 };

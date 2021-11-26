@@ -10,6 +10,7 @@ const nextId = require("../utils/nextId");
 
 // MIDDLEWARE =================================================================================================
 
+// Check if req.body has a valid name property
 const bodyHasName = (req, res, next) => {
   const { data: { name } = {} } = req.body;
 
@@ -22,6 +23,7 @@ const bodyHasName = (req, res, next) => {
   next();
 };
 
+// Check if req.body has a valid description property
 const bodyHasDescription = (req, res, next) => {
   const { data: { description } = {} } = req.body;
 
@@ -34,6 +36,7 @@ const bodyHasDescription = (req, res, next) => {
   next();
 };
 
+// Check if req.body has a valid price property
 const bodyHasPrice = (req, res, next) => {
   const { data: { price } = {} } = req.body;
 
@@ -53,6 +56,7 @@ const bodyHasPrice = (req, res, next) => {
   next();
 };
 
+// Check if req.body has a valid image_url property
 const bodyHasImageUrl = (req, res, next) => {
   const { data: { image_url } = {} } = req.body;
 
@@ -65,6 +69,7 @@ const bodyHasImageUrl = (req, res, next) => {
   next();
 };
 
+// Check if id matches params id from route
 const isIdValid = (req, res, next) => {
   const { dishId } = req.params;
   const { data: { id } = {} } = req.body;
@@ -83,6 +88,7 @@ const isIdValid = (req, res, next) => {
   next();
 };
 
+// Check if dish exists
 const dishExists = (req, res, next) => {
   const { dishId } = req.params;
 
@@ -98,14 +104,17 @@ const dishExists = (req, res, next) => {
 
 // ROUTE RESOURCES (CRUD HANDLERS) =============================================================================
 
+// GET /dishes
 const list = (req, res) => {
   res.json({ data: dishes });
 };
 
+// GET /dishes/:dishId
 const read = (req, res) => {
   res.json({ data: res.locals.dish });
 };
 
+// POST /dishes
 const create = (req, res) => {
   const { data: { name, description, price, image_url } = {} } = req.body;
 
@@ -121,6 +130,7 @@ const create = (req, res) => {
   res.status(201).json({ data: newDish });
 };
 
+// PUT /dishes/:dishId
 const update = (req, res, next) => {
   const { dishId } = req.params;
   let dish = res.locals.dish;
