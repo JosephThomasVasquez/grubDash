@@ -75,7 +75,7 @@ const dishExists = (req, res, next) => {
     return next();
   }
 
-  return next({ status: 404, message: `Dish id not found: ${dishId}` });
+  return next({ status: 404, message: `Dish does not exist: ${dishId}` });
 };
 
 // ROUTE RESOURCES (CRUD HANDLERS) =============================================================================
@@ -104,7 +104,31 @@ const create = (req, res) => {
 };
 
 const update = (req, res, next) => {
-  const dish = res.locals.dish;
+  const { dishId } = req.params;
+  let dish = res.locals.dish;
+  const { data: { id, name, description, price, image_url } = {} } = req.body;
+
+  console.log("dishId", typeof dish, dish);
+
+  if (dishId !== dish.id) {
+    return next({
+      status: 404,
+      message: `Dish id does not match route id. Dish: ${dish.id}, Route: ${dishId}`,
+    });
+  }
+
+  const updateDish = {
+    id: dish.id,
+    name,
+    description,
+    price: Number(price),
+    image_url,
+  };
+
+  dish = updateDish;
+  console.log("locas dish", dish);
+
+  res.status(200).json({ data: dish });
 };
 
 module.exports = {
@@ -116,5 +140,13 @@ module.exports = {
     bodyHasPrice,
     bodyHasImageUrl,
     create,
+  ],
+  update: [
+    dishExists,
+    bodyHasName,
+    bodyHasDescription,
+    bodyHasPrice,
+    bodyHasImageUrl,
+    update,
   ],
 };
