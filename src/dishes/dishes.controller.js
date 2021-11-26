@@ -44,7 +44,7 @@ const bodyHasPrice = (req, res, next) => {
     });
   }
 
-  if (price <= 0 || isNaN(price)) {
+  if (price <= 0 || typeof price !== "number") {
     next({
       status: 400,
       message: "Dish must have a price that is an integer greater than 0",
@@ -62,6 +62,24 @@ const bodyHasImageUrl = (req, res, next) => {
       message: "Dish must include a image_url",
     });
   }
+  next();
+};
+
+const isIdValid = (req, res, next) => {
+  const { dishId } = req.params;
+  const { data: { id } = {} } = req.body;
+
+  if (id === null || id === undefined || id === "") {
+    return next();
+  }
+
+  if (id !== dishId) {
+    return next({
+      status: 400,
+      message: `Dish id does not match route id. Dish: ${id}, Route: ${dishId}`,
+    });
+  }
+
   next();
 };
 
@@ -110,25 +128,18 @@ const update = (req, res, next) => {
 
   console.log("dishId", typeof dish, dish);
 
-  if (dishId !== dish.id) {
-    return next({
-      status: 404,
-      message: `Dish id does not match route id. Dish: ${dish.id}, Route: ${dishId}`,
-    });
-  }
-
   const updateDish = {
-    id: dish.id,
+    id: dishId,
     name,
     description,
-    price: Number(price),
+    price,
     image_url,
   };
 
   dish = updateDish;
   console.log("locas dish", dish);
 
-  res.status(200).json({ data: dish });
+  return res.status(200).json({ data: dish });
 };
 
 module.exports = {
@@ -147,6 +158,7 @@ module.exports = {
     bodyHasDescription,
     bodyHasPrice,
     bodyHasImageUrl,
+    isIdValid,
     update,
   ],
 };
