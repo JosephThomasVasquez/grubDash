@@ -79,6 +79,44 @@ const bodyHasDishQuantity = (req, res, next) => {
   next();
 };
 
+const isIdValid = (req, res, next) => {
+  const { orderId } = req.params;
+  const { data: { id } = {} } = req.body;
+
+  if (id === null || id === undefined || id === "") {
+    return next();
+  }
+
+  if (id !== orderId) {
+    return next({
+      status: 400,
+      message: `Order id does not match route id. Dish: ${id}, Route: ${orderId}`,
+    });
+  }
+
+  next();
+};
+
+const orderStatus = (req, res, next) => {
+  const { orderId } = req.params;
+  const { data: { status } = {} } = req.body;
+
+  if (
+    status === null ||
+    status === undefined ||
+    status === "" ||
+    status === "invalid"
+  ) {
+    return next({
+      status: 400,
+      message: `Order must have a status of pending, preparing, out-for-delivery, delivered`,
+    });
+  }
+
+  //   if (status === "delivered")
+  return next();
+};
+
 const orderExists = (req, res, next) => {
   const { orderId } = req.params;
 
@@ -117,6 +155,27 @@ const create = (req, res) => {
   res.status(201).json({ data: newOrder });
 };
 
+const update = (req, res, next) => {
+  const { orderId } = req.params;
+  let order = res.locals.order;
+  const { data: { id, deliverTo, mobileNumber, status, dishes } = {} } =
+    req.body;
+
+  const updateOrder = {
+    id: orderId,
+    deliverTo,
+    mobileNumber,
+    status,
+    dishes,
+  };
+
+  order = updateOrder;
+
+  return res.status(200).json({ data: order });
+};
+
+const destroy = (req, res, next) => {};
+
 module.exports = {
   list,
   read: [orderExists, read],
@@ -126,5 +185,15 @@ module.exports = {
     bodyHasDishes,
     bodyHasDishQuantity,
     create,
+  ],
+  update: [
+    orderExists,
+    bodyHasDeliverTo,
+    bodyHasMobileNumber,
+    bodyHasDishes,
+    bodyHasDishQuantity,
+    isIdValid,
+    orderStatus,
+    update,
   ],
 };
