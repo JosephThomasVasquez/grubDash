@@ -10,6 +10,7 @@ const nextId = require("../utils/nextId");
 
 // MIDDLEWARE =================================================================================================
 
+// Check if req.body has a valid deliverTo property
 const bodyHasDeliverTo = (req, res, next) => {
   const { data: { deliverTo } = {} } = req.body;
 
@@ -22,6 +23,7 @@ const bodyHasDeliverTo = (req, res, next) => {
   next();
 };
 
+// Check if req.body has a valid mobileNumber property
 const bodyHasMobileNumber = (req, res, next) => {
   const { data: { mobileNumber } = {} } = req.body;
 
@@ -34,6 +36,7 @@ const bodyHasMobileNumber = (req, res, next) => {
   next();
 };
 
+// Check if req.body has a valid dishes array property
 const bodyHasDishes = (req, res, next) => {
   const { data: { dishes } = {} } = req.body;
 
@@ -56,6 +59,7 @@ const bodyHasDishes = (req, res, next) => {
   next();
 };
 
+// Check if req.body has a valid dish quantity property
 const bodyHasDishQuantity = (req, res, next) => {
   const { data: { dishes } = {} } = req.body;
 
@@ -78,6 +82,7 @@ const bodyHasDishQuantity = (req, res, next) => {
   next();
 };
 
+// Check if id matches params id from route
 const isIdValid = (req, res, next) => {
   const { orderId } = req.params;
   const { data: { id } = {} } = req.body;
@@ -96,6 +101,7 @@ const isIdValid = (req, res, next) => {
   next();
 };
 
+// Check if req.body has a valid order status property
 const isValidStatus = (req, res, next) => {
   const { orderId } = req.params;
   const { data: { status } = {} } = req.body;
@@ -112,10 +118,10 @@ const isValidStatus = (req, res, next) => {
     });
   }
 
-  //   if (status === "delivered")
   return next();
 };
 
+// Check if the order status is pending so it can be deleted
 const orderIsPending = (req, res, next) => {
   const { status } = res.locals.order;
 
@@ -129,6 +135,7 @@ const orderIsPending = (req, res, next) => {
   });
 };
 
+// Check if order exists
 const orderExists = (req, res, next) => {
   const { orderId } = req.params;
 
@@ -144,14 +151,17 @@ const orderExists = (req, res, next) => {
 
 // ROUTE RESOURCES (CRUD HANDLERS) =============================================================================
 
+// GET /orders
 const list = (req, res) => {
   res.json({ data: orders });
 };
 
+// GET /orders/:orderId
 const read = (req, res) => {
   res.json({ data: res.locals.order });
 };
 
+// POST /orders
 const create = (req, res) => {
   const { data: { deliverTo, mobileNumber, status, dishes } = {} } = req.body;
 
@@ -167,6 +177,7 @@ const create = (req, res) => {
   res.status(201).json({ data: newOrder });
 };
 
+// PUT /orders/:orderId
 const update = (req, res, next) => {
   const { orderId } = req.params;
   let order = res.locals.order;
@@ -186,6 +197,7 @@ const update = (req, res, next) => {
   return res.status(200).json({ data: order });
 };
 
+// DELETE /orders/:orderId
 const destroy = (req, res) => {
   const { orderId } = req.params;
   const index = orders.findIndex((order) => order.id === orderId);
