@@ -92,16 +92,25 @@ const read = (req, res) => {
 const create = (req, res) => {
   const { data: { deliverTo, mobileNumber, status, dishes } = {} } = req.body;
 
-  const newDish = {
+  const newOrder = {
     id: nextId(),
-    name,
-    description,
-    price,
-    image_url,
+    deliverTo,
+    mobileNumber,
+    status,
+    dishes,
   };
 
-  dishes.push(newDish);
-  res.status(201).json({ data: newDish });
+  orders.push(newOrder);
+  res.status(201).json({ data: newOrder });
 };
 
-module.exports = { list };
+module.exports = {
+  list,
+  create: [
+    bodyHasDeliverTo,
+    bodyHasMobileNumber,
+    bodyHasDishes,
+    bodyHasDishQuantity,
+    create,
+  ],
+};
